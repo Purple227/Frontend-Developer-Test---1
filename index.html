@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Concept Nova Technical Interview with Okiemete </title>
+	<script type="text/javascript" src="file.js"></script>
+	<link rel="stylesheet" type="text/css" href="file.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+
+</head>
+
+<body>
+
+	<!-- vue attach here -->
+	<div id="app">
+
+
+		<div class="field">
+			<label class="label"> </label>
+
+			<div class="field">
+				<label class="label">Email</label>
+				<div class="control">
+					<input class="input" type="email" placeholder="e.g. alexsmith@gmail.com" v-model= "login.email">
+				</div>
+
+				<div class="control">
+					<label class="label">Password</label>
+					<input class="input" type="password" v-model="login.password">
+				</div>
+			</div>
+
+
+		</div>
+
+		{{  typeof login.email}}
+		{{ typeof login.password}}
+
+		<div class="control">
+			<button class="button is-link" @click="loginMethod"> Login</button>
+		</div>
+
+
+
+		<h1 class="title is-bold"> Auth site List </h1>
+		<!-- Authenticated user section -->
+		<ul>
+			<li v-for="site in authSite">
+				{{ site.site_id }} :::
+				{{ site.site_name }} ::
+				{{ site.site_tank_count }}
+				<div class="control">
+					<button class="button is-link" @click="getAuthUserTank(site.site_id)"> View Tank </button>
+				</div>
+			</li>
+		</ul>
+
+
+		<h1 class="title is-bold"> Auth User Tank  </h1>
+		<!-- Auth tank by user id -->
+		<ul>
+			<li v-for="tank in authTankById">
+				{{ tank.tank_id }} :::
+				{{ tank.tank_name }} 
+			</li>
+			<div class="control">
+				<button class="button is-link" @click="getAuth(site.site_id)"> View Tank </button>
+			</div>
+		</ul>
+
+	</div>
+
+	<script>
+
+		var app = new Vue({
+			el: '#app',
+
+			data: {
+				message: 'Hello Vue!',
+
+				login: {
+					email: null,
+					password: null,
+				},
+
+				authSite: null,
+				authTankById: null,
+
+			},
+
+			created() {
+				this.getAuthUserSite()
+			},
+
+			methods: {
+				loginMethod: function () {
+					self = this
+					console.log(this.login.email)
+					axios.post('https://fcs.concept-nova.com/api/v1/login', {
+						email: self.login.email,
+						password: self.login.password
+					})
+					.then(function (response) {
+						let token = response.data.message.token
+						window.localStorage.setItem('token', token);
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+				},
+
+
+
+
+
+
+
+
+getAuthUserSite: function () { // Get Auth User calibrace open
+
+	self = this 
+// Make a request for a user with a given ID
+axios.get('https://fcs.concept-nova.com/api/v1/sites/?token=' + window.localStorage.getItem('token') )
+.then(function (response) {
+    // handle success
+    self.authSite = response.data.message
+})
+.catch(function (error) {
+    // handle error
+    console.log(error);
+})
+.then(function () {
+    // always executed
+});
+
+
+}, // Get Auth User calibrace close
+
+
+
+
+
+getAuthUserTank: function (siteId) { // Get calibrace open
+
+	self = this 
+	let token = window.localStorage.getItem('token')
+	let site_id = siteId
+if (site_id == 'undefine') { //If statement calibrace open 
+	//oops stay put
+} else {
+	// Make a request for a user with a given ID
+	axios.get(`https://fcs.concept-nova.com/api/v1/sites/${site_id}?token=${token}` )
+	.then(function (response) {
+    // handle success
+    self.authTankById = response.data.message
+})
+	.catch(function (error) {
+    // handle error
+    console.log(error);
+})
+	.then(function () {
+    // always executed
+});
+
+} //If statement calibrace close 
+
+
+}, // Get calibrace close
+
+
+
+// fetchTank: function (siteId,tankId) { // Get calibrace open
+
+// 	self = this 
+// 	let token = window.localStorage.getItem('token')
+// 	let site_id = siteId
+// if (site_id == 'undefine') { //If statement calibrace open 
+// 	//oops stay put
+// } else {
+// 	// Make a request for a user with a given ID
+// 	axios.get(`https://fcs.concept-nova.com/api/v1/sites/{site_id}/${tank_id}?token=${token}` )
+// 	.then(function (response) {
+//     // handle success
+//     self.authTankById = response.data.message
+// })
+// 	.catch(function (error) {
+//     // handle error
+//     console.log(error);
+// })
+// 	.then(function () {
+//     // always executed
+// });
+
+// } //If statement calibrace close 
+
+
+// }, // Get calibrace close
+
+
+
+
+},
+
+
+})
+
+</script>
+
+</body>
+
+</html>
